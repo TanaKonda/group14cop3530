@@ -93,61 +93,65 @@ int editCount(string beginWord, string endWord, int wordOne, int wordTwo)
 	return matrix[wordOne][wordTwo];
 }
 
-vector<int> longestIncreasingSubsequence(vector<int> & arrA) {
-	int LIS[arrA.size()];
-	for (int i = 0; i < arrA.size(); i++)
-	{
-		int max = -1;				// anything will be greater.
-		for (int j = 0; j < i; j++)
-		{
-			// check if previous elements > current element
-			if (arrA[i] > arrA[j])
-			{
-				// update the max from the previous entries
-				if (max == -1 || max < LIS[j] + 1)
-				{
-					max = 1 + LIS[j];
-				}
-			}
-		}
-		if (max == -1)
-		{
-			// means none of the previous element has smaller than arrA[i]
-			max = 1;
-		}
-		LIS[i] = max;
-	}
+int GetCeilIndex(vector<int> A, int T[], int l, int r, int key) {
+   int m;
 
-	// find the max in the LIS[]
-	int result = -1;
-	int index = -1;
-	for (int i = 0; i < arrA.size(); i++)
-	{
-		if (result < LIS[i])
-		{
-			result = LIS[i];
-			index = i;
-		}
-	}
-	// Print the result
-	// cout << "result is : " << result << endl;
-	// Start moving backwards from the end and
-	vector<int> path;
-	path.push_back(arrA[index]);
-	result = result - 1;
-	for (int i = index - 1; i >= 0; i--)
-	{
-		if (LIS[i] == result)
-		{
-			// cout << "at lis[i] " << LIS[i] << " we pushed in " << arrA[i] << endl;
-			path.push_back(arrA[i]);
-			result--;
-		}
-	}
-	// cout << "Actual Elements: ";	
-	return path;
+   while( r - l > 1 ) {
+      m = l + (r - l)/2;
+      if( A[T[m]] >= key )
+         r = m;
+      else
+         l = m;
+   }
+
+   return r;
 }
 
+vector <int> longestIncreasingSubsequence(vector<int> A) {
+   // Add boundary case, when array size is zero
+   // Depend on smart pointers
+   int size=A.size();
+    stack<int> LIS;
+    int lis=0;
+   int *tailIndices = new int[size];
+   int *prevIndices = new int[size];
+   int len;
+   vector<int> finalLIS;
+   memset(tailIndices, 0, sizeof(tailIndices[0])*size);
+   memset(prevIndices, 0xFF, sizeof(prevIndices[0])*size);
+   tailIndices[0] = 0;
+   prevIndices[0] = -1;
+   len = 1; // it will always point to empty location
+   for( int i = 1; i < size; i++ ) {
+      if( A[i] < A[tailIndices[0]] ) {
+         // new smallest value
+         tailIndices[0] = i;
+      } else if( A[i] > A[tailIndices[len-1]] ) {
+         // A[i] wants to extend largest subsequence
+         prevIndices[i] = tailIndices[len-1];
+         tailIndices[len++] = i;
+      } else {
+         // A[i] wants to be a potential condidate of future subsequence
+         // It will replace ceil value in tailIndices
+        int pos = GetCeilIndex(A, tailIndices, -1, len-1, A[i]);
+
+        prevIndices[i] = tailIndices[pos-1];
+        tailIndices[pos] = i;
+      }
+   }
+   cout << "LIS of given input" << endl;
+   for( int i = tailIndices[len-1]; i >= 0; i = prevIndices[i] )
+        LIS.push(A[i]);
+        lis++;
+
+   delete[] tailIndices;
+   delete[] prevIndices;
+    while(!LIS.empty()){
+        finalLIS.push_back(LIS.top());
+        LIS.pop();
+    }
+   return finalLIS;
+}
 int minDistance(int distance[], bool shortestPath[], int numWords)
 {
 	int min = numeric_limits<int>::max();;
