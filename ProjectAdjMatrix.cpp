@@ -6,7 +6,17 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <sstream>
 using namespace std;
+
+string IntToString(int number)
+{
+	ostringstream oss;
+
+	oss << number;
+
+	return oss.str();
+}
 
 struct realm {
 	string charm;
@@ -53,7 +63,7 @@ int minimum(int x, int y, int z)
 
 int editCount(string beginWord, string endWord, int wordOne, int wordTwo)
 {
-	vector<vector<int> > matrix(wordOne+1, vector<int>(wordTwo+1));
+	vector<vector<int>> matrix(wordOne+1, vector<int>(wordTwo+1));
 
 	for (int i = 0; i < wordOne; i++)
 	{
@@ -155,7 +165,7 @@ int minDistance(int distance[], bool shortestPath[], int numWords)
 	return minIndex;
 }
 
-void dijkstra(vector<vector<int> > graph, int src, int dest, int numWords)
+string dijkstra(vector<vector<int>> graph, int src, int dest, int numWords)
 {
 	int distance[numWords];
 
@@ -185,11 +195,11 @@ void dijkstra(vector<vector<int> > graph, int src, int dest, int numWords)
 	}
 	if (distance[dest] != numeric_limits<int>::max())
 	{
-		cout << distance[dest];
+		return IntToString(distance[dest]);
 	}
 	else
 	{
-		cout << "IMPOSSIBLE";
+		return "IMPOSSIBLE";
 	}
 }
 int main()
@@ -197,8 +207,8 @@ int main()
 	int numWords;
 	cin >> numWords;
 
-	vector<vector<int> > graph(numWords, vector<int>(numWords));
-	vector<vector<int> > gemGraph(numWords, vector<int>(numWords));
+	vector<vector<int>> graph(numWords, vector<int>(numWords));
+	vector<vector<int>> gemGraph(numWords, vector<int>(numWords));
 	for (int i = 0; i < numWords; i++)
 	{
 		for (int j = 0; j < numWords; j++)
@@ -263,13 +273,19 @@ int main()
 		}
 		x++;
 	}
-	dijkstra(graph, src, dest, numWords);
+	cout << dijkstra(graph, src, dest, numWords);
 	cout << " ";
-	dijkstra(gemGraph, src, dest, numWords);
+	if (dijkstra(graph, src, dest, numWords) != "IMPOSSIBLE")
+	{
+		cout << dijkstra(gemGraph, src, dest, numWords);
+	}
 	cout << endl;
-	dijkstra(graph, dest, src, numWords);
+	cout << dijkstra(graph, dest, src, numWords);
 	cout << " ";
-	dijkstra(gemGraph, dest, src, numWords);
+	if (dijkstra(graph, dest, src, numWords) != "IMPOSSIBLE")
+	{
+		cout << dijkstra(gemGraph, dest, src, numWords);
+	}
 	return 0;
 }
 
