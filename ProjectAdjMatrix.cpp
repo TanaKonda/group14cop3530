@@ -7,6 +7,17 @@
 #include <vector>
 #include <algorithm>
 #include <sstream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <iostream>
+#include <string.h>
+#include <stdio.h>
+#include <stack>
 using namespace std;
 
 string IntToString(int number)
