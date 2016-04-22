@@ -7,17 +7,6 @@
 #include <vector>
 #include <algorithm>
 #include <sstream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <limits.h>
-#include <iostream>
-#include <string>
-#include <vector>
-#include <algorithm>
-#include <iostream>
-#include <string.h>
-#include <stdio.h>
-#include <stack>
 using namespace std;
 
 string IntToString(int number)
@@ -104,65 +93,61 @@ int editCount(string beginWord, string endWord, int wordOne, int wordTwo)
 	return matrix[wordOne][wordTwo];
 }
 
-int GetCeilIndex(vector<int> A, int T[], int l, int r, int key) {
-   int m;
+vector<int> longestIncreasingSubsequence(vector<int> & arrA) {
+	int LIS[arrA.size()];
+	for (int i = 0; i < arrA.size(); i++)
+	{
+		int max = -1;				// anything will be greater.
+		for (int j = 0; j < i; j++)
+		{
+			// check if previous elements > current element
+			if (arrA[i] > arrA[j])
+			{
+				// update the max from the previous entries
+				if (max == -1 || max < LIS[j] + 1)
+				{
+					max = 1 + LIS[j];
+				}
+			}
+		}
+		if (max == -1)
+		{
+			// means none of the previous element has smaller than arrA[i]
+			max = 1;
+		}
+		LIS[i] = max;
+	}
 
-   while( r - l > 1 ) {
-      m = l + (r - l)/2;
-      if( A[T[m]] >= key )
-         r = m;
-      else
-         l = m;
-   }
-
-   return r;
+	// find the max in the LIS[]
+	int result = -1;
+	int index = -1;
+	for (int i = 0; i < arrA.size(); i++)
+	{
+		if (result < LIS[i])
+		{
+			result = LIS[i];
+			index = i;
+		}
+	}
+	// Print the result
+	// cout << "result is : " << result << endl;
+	// Start moving backwards from the end and
+	vector<int> path;
+	path.push_back(arrA[index]);
+	result = result - 1;
+	for (int i = index - 1; i >= 0; i--)
+	{
+		if (LIS[i] == result)
+		{
+			// cout << "at lis[i] " << LIS[i] << " we pushed in " << arrA[i] << endl;
+			path.push_back(arrA[i]);
+			result--;
+		}
+	}
+	// cout << "Actual Elements: ";	
+	return path;
 }
 
-vector <int> longestIncreasingSubsequence(vector<int> A) {
-   // Add boundary case, when array size is zero
-   // Depend on smart pointers
-   int size=A.size();
-    stack<int> LIS;
-    int lis=0;
-   int *tailIndices = new int[size];
-   int *prevIndices = new int[size];
-   int len;
-   vector<int> finalLIS;
-   memset(tailIndices, 0, sizeof(tailIndices[0])*size);
-   memset(prevIndices, 0xFF, sizeof(prevIndices[0])*size);
-   tailIndices[0] = 0;
-   prevIndices[0] = -1;
-   len = 1; // it will always point to empty location
-   for( int i = 1; i < size; i++ ) {
-      if( A[i] < A[tailIndices[0]] ) {
-         // new smallest value
-         tailIndices[0] = i;
-      } else if( A[i] > A[tailIndices[len-1]] ) {
-         // A[i] wants to extend largest subsequence
-         prevIndices[i] = tailIndices[len-1];
-         tailIndices[len++] = i;
-      } else {
-         // A[i] wants to be a potential condidate of future subsequence
-         // It will replace ceil value in tailIndices
-        int pos = GetCeilIndex(A, tailIndices, -1, len-1, A[i]);
-
-        prevIndices[i] = tailIndices[pos-1];
-        tailIndices[pos] = i;
-      }
-   }
-   cout << "LIS of given input" << endl;
-   for( int i = tailIndices[len-1]; i >= 0; i = prevIndices[i] )
-        LIS.push(A[i]);
-        lis++;
-
-   delete[] tailIndices;
-   delete[] prevIndices;
-    while(!LIS.empty()){
-        finalLIS.push_back(LIS.top());
-        LIS.pop();
-    }
-   return finalLIS;
-}
 int minDistance(int distance[], bool shortestPath[], int numWords)
 {
 	int min = numeric_limits<int>::max();;
@@ -180,7 +165,7 @@ int minDistance(int distance[], bool shortestPath[], int numWords)
 	return minIndex;
 }
 
-string dijkstra(vector<vector<int>> graph, int src, int dest, int numWords)
+void dijkstra(vector<vector<int>> graph, int src, int dest, int numWords, vector<int>& numGems, vector<realm> realms)
 {
 	int distance[numWords];
 
@@ -193,6 +178,7 @@ string dijkstra(vector<vector<int>> graph, int src, int dest, int numWords)
 	}
 
 	distance[src] = 0;
+	numGems[src] = 0;
 
 	for (int i = 0; i < numWords - 1; i++)
 	{
@@ -205,16 +191,17 @@ string dijkstra(vector<vector<int>> graph, int src, int dest, int numWords)
 			if (shortestPath[v] == false && graph[u][v] != 0 && distance[u] != numeric_limits<int>::max() && distance[u] + graph[u][v] < distance[v])
 			{
 				distance[v] = distance[u] + graph[u][v];
+				numGems[v] = numGems[u] + sum(realms[u].longestSub, graph[u][v]);
 			}
 		}
 	}
 	if (distance[dest] != numeric_limits<int>::max())
 	{
-		return IntToString(distance[dest]);
+		cout << distance[dest];
 	}
 	else
 	{
-		return "IMPOSSIBLE";
+		cout << "IMPOSSIBLE";
 	}
 }
 int main()
@@ -288,18 +275,20 @@ int main()
 		}
 		x++;
 	}
-	cout << dijkstra(graph, src, dest, numWords);
+	vector<int> numGems(numWords);
+
+	dijkstra(graph, src, dest, numWords, numGems, realms);
 	cout << " ";
-	if (dijkstra(graph, src, dest, numWords) != "IMPOSSIBLE")
+	if (numGems[dest] != 0)
 	{
-		cout << dijkstra(gemGraph, src, dest, numWords);
+		cout << numGems[dest];
 	}
 	cout << endl;
-	cout << dijkstra(graph, dest, src, numWords);
+	dijkstra(graph, dest, src, numWords, numGems, realms);
 	cout << " ";
-	if (dijkstra(graph, dest, src, numWords) != "IMPOSSIBLE")
+	if (numGems[src] != 0)
 	{
-		cout << dijkstra(gemGraph, dest, src, numWords);
+		cout << numGems[src];
 	}
 	return 0;
 }
