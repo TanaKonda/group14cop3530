@@ -210,13 +210,11 @@ int main()
 	cin >> numWords;
 
 	vector<vector<int>> graph(numWords, vector<int>(numWords));
-	vector<vector<int>> gemGraph(numWords, vector<int>(numWords));
 	for (int i = 0; i < numWords; i++)
 	{
 		for (int j = 0; j < numWords; j++)
 		{
 			graph[i][j] = 0;
-			gemGraph[i][j] = 0;
 		}
 	}
 
@@ -269,7 +267,6 @@ int main()
 			if (x != y && editCount(i->charm, j->charm, (i->charm).length(), (j->charm).length()) <= i->longestSub.size())
 			{
 				graph[x][y] = editCount(i->charm, j->charm, (i->charm).length(), (j->charm).length());
-				gemGraph[x][y] = sum(i->longestSub, editCount(i->charm, j->charm, (i->charm).length(), (j->charm).length()));
 			}
 			y++;
 		}
