@@ -53,7 +53,7 @@ int minimum(int x, int y, int z)
 
 int editCount(string beginWord, string endWord, int wordOne, int wordTwo)
 {
-	vector<vector<int>> matrix(wordOne+1, vector<int>(wordTwo+1));
+	vector<vector<int> > matrix(wordOne+1, vector<int>(wordTwo+1));
 
 	for (int i = 0; i < wordOne; i++)
 	{
@@ -155,7 +155,7 @@ int minDistance(int distance[], bool shortestPath[], int numWords)
 	return minIndex;
 }
 
-void dijkstra(vector<vector<int>> graph, int src, int dest, int numWords)
+void dijkstra(vector<vector<int> > graph, int src, int dest, int numWords)
 {
 	int distance[numWords];
 
@@ -197,8 +197,8 @@ int main()
 	int numWords;
 	cin >> numWords;
 
-	vector<vector<int>> graph(numWords, vector<int>(numWords));
-	vector<vector<int>> gemGraph(numWords, vector<int>(numWords));
+	vector<vector<int> > graph(numWords, vector<int>(numWords));
+	vector<vector<int> > gemGraph(numWords, vector<int>(numWords));
 	for (int i = 0; i < numWords; i++)
 	{
 		for (int j = 0; j < numWords; j++)
