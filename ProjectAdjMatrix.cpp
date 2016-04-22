@@ -64,26 +64,20 @@ int editCount(string beginWord, string endWord, int wordOne, int wordTwo)
 		matrix[0][j] = j;
 	}
 
-	for (int i = 0; i <= wordOne; i++)
+	for (int i = 1; i <= wordOne; i++)
 	{
-		for (int j = 0; j <= wordTwo; j++)
+		for (int j = 1; j <= wordTwo; j++)
 		{
-			if (i == 0)
+			int third;
+			if (beginWord[i-1] == endWord[j-1])
 			{
-				matrix[i][j] = j;
-			}
-			else if (j == 0)
-			{
-				matrix[i][j] = i;
-			}
-			else if (beginWord[i - 1] == endWord[j - 1])
-			{
-				matrix[i][j] = matrix[i - 1][j - 1];
+				third = matrix[i - 1][j - 1];
 			}
 			else
 			{
-				matrix[i][j] = 1 + minimum(matrix[i][j - 1], matrix[i - 1][j], matrix[i - 1][j - 1]);
+				third = matrix[i - 1][j - 1] + 1;
 			}
+			matrix[i][j] = minimum(1 + matrix[i][j - 1], 1 + matrix[i - 1][j], third);
 		}
 	}
 	return matrix[wordOne][wordTwo];
