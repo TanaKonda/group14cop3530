@@ -6,17 +6,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-#include <sstream>
 using namespace std;
-
-string IntToString(int number)
-{
-	ostringstream oss;
-
-	oss << number;
-
-	return oss.str();
-}
 
 struct realm {
 	string charm;
@@ -29,7 +19,7 @@ struct realm {
 
 int sum(vector<int> subSeq, int edits) {
 	int sum = 0;
-	for (int i = 0; i < edits; i++) {
+	for (int i = subSeq.size() - 1; edits > 0; i--, edits--) {
 		sum += subSeq[i];
 	}
 	return sum;
@@ -165,7 +155,7 @@ int minDistance(int distance[], bool shortestPath[], int numWords)
 	return minIndex;
 }
 
-string dijkstra(vector<vector<int>> graph, int src, int dest, int numWords)
+void dijkstra(vector<vector<int>> graph, int src, int dest, int numWords, vector<int>& numGems, vector<realm> realms)
 {
 	int distance[numWords];
 
@@ -178,6 +168,7 @@ string dijkstra(vector<vector<int>> graph, int src, int dest, int numWords)
 	}
 
 	distance[src] = 0;
+	numGems[src] = 0;
 
 	for (int i = 0; i < numWords - 1; i++)
 	{
@@ -190,16 +181,17 @@ string dijkstra(vector<vector<int>> graph, int src, int dest, int numWords)
 			if (shortestPath[v] == false && graph[u][v] != 0 && distance[u] != numeric_limits<int>::max() && distance[u] + graph[u][v] < distance[v])
 			{
 				distance[v] = distance[u] + graph[u][v];
+				numGems[v] = numGems[u] + sum(realms[u].longestSub, graph[u][v]);
 			}
 		}
 	}
 	if (distance[dest] != numeric_limits<int>::max())
 	{
-		return IntToString(distance[dest]);
+		cout << distance[dest];
 	}
 	else
 	{
-		return "IMPOSSIBLE";
+		cout << "IMPOSSIBLE";
 	}
 }
 int main()
@@ -208,13 +200,11 @@ int main()
 	cin >> numWords;
 
 	vector<vector<int>> graph(numWords, vector<int>(numWords));
-	vector<vector<int>> gemGraph(numWords, vector<int>(numWords));
 	for (int i = 0; i < numWords; i++)
 	{
 		for (int j = 0; j < numWords; j++)
 		{
 			graph[i][j] = 0;
-			gemGraph[i][j] = 0;
 		}
 	}
 
@@ -267,24 +257,25 @@ int main()
 			if (x != y && editCount(i->charm, j->charm, (i->charm).length(), (j->charm).length()) <= i->longestSub.size())
 			{
 				graph[x][y] = editCount(i->charm, j->charm, (i->charm).length(), (j->charm).length());
-				gemGraph[x][y] = sum(i->longestSub, editCount(i->charm, j->charm, (i->charm).length(), (j->charm).length()));
 			}
 			y++;
 		}
 		x++;
 	}
-	cout << dijkstra(graph, src, dest, numWords);
+	vector<int> numGems(numWords);
+
+	dijkstra(graph, src, dest, numWords, numGems, realms);
 	cout << " ";
-	if (dijkstra(graph, src, dest, numWords) != "IMPOSSIBLE")
+	if (numGems[dest] != 0)
 	{
-		cout << dijkstra(gemGraph, src, dest, numWords);
+		cout << numGems[dest];
 	}
 	cout << endl;
-	cout << dijkstra(graph, dest, src, numWords);
+	dijkstra(graph, dest, src, numWords, numGems, realms);
 	cout << " ";
-	if (dijkstra(graph, dest, src, numWords) != "IMPOSSIBLE")
+	if (numGems[src] != 0)
 	{
-		cout << dijkstra(gemGraph, dest, src, numWords);
+		cout << numGems[src];
 	}
 	return 0;
 }
